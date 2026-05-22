@@ -79,25 +79,28 @@ const Sidebar = ({ activeView, onViewChange, onOpenSettings }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="mx-4 mb-6 p-4 bg-gradient-to-br from-purple-500/10 via-blue-500/10 to-pink-500/10 border border-purple-500/20 rounded-2xl backdrop-blur-xl"
+        className="mx-4 mb-4 p-4 bg-slate-800/40 border border-slate-700/40 rounded-2xl"
       >
-        <h3 className="text-sm font-bold text-white mb-3">Daily Progress</h3>
-        <div className="space-y-2">
-          <div className="flex justify-between text-xs text-slate-300 mb-1">
-            <span>
-              {completed} of {total} completed
-            </span>
-            <span className="text-purple-400">{percent.toFixed(0)}%</span>
-          </div>
-          <div className="w-full bg-slate-700/30 rounded-full h-2 overflow-hidden border border-slate-600/50">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${percent}%` }}
-              transition={{ duration: 0.5 }}
-              className="h-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full shadow-lg shadow-purple-500/50"
-            />
-          </div>
-        </div>
+        <p className="text-xs text-slate-300 leading-relaxed mb-3">
+          Small progress every day, leads to big results.
+        </p>
+        {/* Mini sparkline chart */}
+        <svg viewBox="0 0 120 40" className="w-full h-8" preserveAspectRatio="none">
+          <polyline
+            points="0,35 20,28 40,30 60,18 80,22 100,10 120,14"
+            fill="none"
+            stroke="url(#sparkGrad)"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <defs>
+            <linearGradient id="sparkGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#7c3aed" />
+              <stop offset="100%" stopColor="#3b82f6" />
+            </linearGradient>
+          </defs>
+        </svg>
       </motion.div>
 
       <div className="p-4 border-t border-slate-700/30 space-y-3">

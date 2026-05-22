@@ -3,8 +3,9 @@ import { motion } from 'framer-motion';
 import { Trash2, CheckCircle2, Circle } from 'lucide-react';
 import { useTaskContext } from '../hooks/useTaskContext';
 
-const TaskCard = ({ task, onDelete, index }) => {
+const TaskCard = ({ task, onDelete, index, dateString }) => {
   const { toggleTaskCompletion } = useTaskContext();
+  const isChecked = dateString ? task.isCompletedForDate : task.completed;
 
   const categoryColors = {
     personal: 'from-yellow-500 to-orange-500',
@@ -30,7 +31,7 @@ const TaskCard = ({ task, onDelete, index }) => {
       transition={{ delay: index * 0.05 }}
       whileHover={{ scale: 1.02, y: -5 }}
       className={`p-4 rounded-2xl border transition-all ${
-        task.completed
+        isChecked
           ? 'bg-slate-800/30 border-slate-700/20 opacity-60'
           : categoryBg[task.category] || 'bg-slate-800/50 border-slate-700/30'
       }`}
@@ -40,10 +41,10 @@ const TaskCard = ({ task, onDelete, index }) => {
         <motion.button
           whileHover={{ scale: 1.2 }}
           whileTap={{ scale: 0.9 }}
-          onClick={() => toggleTaskCompletion(task.id)}
+          onClick={() => toggleTaskCompletion(task.id, dateString)}
           className="mt-1 flex-shrink-0 text-slate-400 hover:text-purple-400 transition-all"
         >
-          {task.completed ? (
+          {isChecked ? (
             <CheckCircle2 className="w-6 h-6 text-green-500" />
           ) : (
             <Circle className="w-6 h-6" />
@@ -54,7 +55,7 @@ const TaskCard = ({ task, onDelete, index }) => {
         <div className="flex-1 min-w-0">
           <h3
             className={`font-semibold truncate ${
-              task.completed
+              isChecked
                 ? 'text-slate-500 line-through'
                 : 'text-white'
             }`}

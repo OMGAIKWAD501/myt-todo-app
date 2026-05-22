@@ -70,7 +70,7 @@ const CenterSection = ({
         onViewModeChange={onViewModeChange}
       />
 
-      <div className="flex-1 overflow-y-auto">{renderCalendarBody()}</div>
+      <div className="flex-1 flex flex-col overflow-hidden">{renderCalendarBody()}</div>
     </motion.div>
   );
 };
