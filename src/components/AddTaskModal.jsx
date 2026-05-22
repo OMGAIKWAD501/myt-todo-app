@@ -84,15 +84,15 @@ const AddTaskModal = ({ isOpen, onClose, selectedDate }) => {
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
           />
 
-          {/* Modal */}
+          {/* Modal: bottom sheet on mobile, centered on desktop */}
           <motion.div
-            initial={{ scale: 0.95, opacity: 0, y: 20 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.95, opacity: 0, y: 20 }}
+            initial={{ y: '100%', opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: '100%', opacity: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md z-50"
+            className="fixed bottom-0 left-0 right-0 z-50 sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:right-auto sm:transform sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-full sm:max-w-md"
           >
-            <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-navy border border-slate-700/50 rounded-3xl shadow-2xl shadow-purple-500/20">
+            <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-navy border border-slate-700/50 rounded-t-3xl sm:rounded-3xl shadow-2xl shadow-purple-500/20 overflow-y-auto" style={{ maxHeight: '90vh' }}>
               {/* Header */}
               <div className="flex items-center justify-between p-6 border-b border-slate-700/30">
                 <h2 className="text-2xl font-bold text-white">Add New Task</h2>

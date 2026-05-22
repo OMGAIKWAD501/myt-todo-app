@@ -38,3 +38,25 @@ html.light .border-slate-700\/30,
 html.light .border-slate-700\/50 {
   border-color: rgb(203 213 225 / 0.8);
 }
+
+/* ── Mobile utilities ── */
+html, body, #root {
+  height: 100%;
+  overscroll-behavior: none;
+}
+
+/* Hide scrollbar but keep functionality */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Safe area padding for notched phones (iOS etc.) */
+.safe-area-pb {
+  padding-bottom: max(0.25rem, env(safe-area-inset-bottom));
+}
+
+/* Ensure calendar grid cells don't overflow on small screens */
+@media (max-width: 640px) {
+  .calendar-cell {
+    min-height: 48px;
+  }
+}

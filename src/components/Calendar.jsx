@@ -111,13 +111,15 @@ const Calendar = ({ currentDate, selectedDate, onDateSelect }) => {
         {dayNames.map((name, i) => (
           <div
             key={name}
-            className={`text-center text-xs font-semibold py-3 tracking-wide ${
-              i === 0 ? 'text-red-400'       // Sun
-            : i === 6 ? 'text-purple-400'    // Sat
+            className={`text-center text-[10px] sm:text-xs font-semibold py-2 sm:py-3 tracking-wide ${
+              i === 0 ? 'text-red-400'
+            : i === 6 ? 'text-purple-400'
             : 'text-slate-400'
             }`}
           >
-            {name}
+            {/* Show 1 letter on very small screens, full abbrev on larger */}
+            <span className="sm:hidden">{name[0]}</span>
+            <span className="hidden sm:inline">{name}</span>
           </div>
         ))}
       </div>
@@ -162,9 +164,9 @@ const Calendar = ({ currentDate, selectedDate, onDateSelect }) => {
               )}
 
               {/* Day number */}
-              <div className="px-2 pt-2 pb-1">
+              <div className="px-1 sm:px-2 pt-1.5 sm:pt-2 pb-0.5 sm:pb-1">
                 <span className={`
-                  text-xs font-semibold leading-none w-6 h-6
+                  text-[10px] sm:text-xs font-semibold leading-none w-5 h-5 sm:w-6 sm:h-6
                   inline-flex items-center justify-center rounded-full
                   ${isDayToday  ? 'bg-purple-600 text-white' :
                     isSelected  ? 'text-blue-300'  :
@@ -176,7 +178,7 @@ const Calendar = ({ currentDate, selectedDate, onDateSelect }) => {
                 </span>
               </div>
 
-              {/* Task rows: ● name */}
+              {/* Task rows: on desktop show label, on mobile show dots only */}
               <div className="px-1 pb-1 flex flex-col gap-0.5 overflow-hidden">
                 {tasks.slice(0, 3).map((task) => {
                   const isBeingDragged = draggingTask?.task?.id === task.id;
@@ -193,7 +195,7 @@ const Calendar = ({ currentDate, selectedDate, onDateSelect }) => {
                       onDragStart={(e) => handleTaskDragStart(e, task, dateString)}
                       onDragEnd={handleTaskDragEnd}
                       title={task.title}
-                      className={`flex items-center gap-1 rounded px-1 py-0.5 min-w-0 ${
+                      className={`flex items-center gap-1 rounded px-0.5 sm:px-1 py-0.5 min-w-0 ${
                         !task.completed ? 'cursor-grab active:cursor-grabbing hover:bg-slate-700/40' : ''
                       }`}
                     >
@@ -202,8 +204,8 @@ const Calendar = ({ currentDate, selectedDate, onDateSelect }) => {
                         className="w-1.5 h-1.5 rounded-full flex-shrink-0"
                         style={{ backgroundColor: dotColor }}
                       />
-                      {/* Task name */}
-                      <span className={`text-[11px] truncate leading-tight font-medium ${
+                      {/* Task name: hidden on mobile */}
+                      <span className={`hidden sm:inline text-[11px] truncate leading-tight font-medium ${
                         task.completed ? 'text-slate-500 line-through' : 'text-slate-200'
                       }`}>
                         {task.title}
@@ -213,8 +215,8 @@ const Calendar = ({ currentDate, selectedDate, onDateSelect }) => {
                 })}
 
                 {tasks.length > 3 && (
-                  <span className="text-[10px] text-slate-500 px-1">
-                    +{tasks.length - 3} more
+                  <span className="text-[9px] sm:text-[10px] text-slate-500 px-1">
+                    +{tasks.length - 3}
                   </span>
                 )}
               </div>

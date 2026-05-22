@@ -19,7 +19,7 @@ const priorityBadge = {
   low:    'bg-green-500/20 text-green-300 border border-green-500/30',
 };
 
-const TaskPanel = ({ selectedDate, onAddTask, showAllTasks = false }) => {
+const TaskPanel = ({ selectedDate, onAddTask, showAllTasks = false, isMobileSheet = false }) => {
   const {
     tasks,
     getTasksForDate,
@@ -52,7 +52,11 @@ const TaskPanel = ({ selectedDate, onAddTask, showAllTasks = false }) => {
       initial={{ x: 100, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="w-96 bg-gradient-to-b from-slate-900 via-slate-900 to-navy border-l border-slate-700/50 flex flex-col h-screen overflow-hidden shrink-0"
+      className={`bg-gradient-to-b from-slate-900 via-slate-900 to-navy border-l border-slate-700/50 flex flex-col ${
+        isMobileSheet
+          ? 'w-full'
+          : 'w-96 h-screen overflow-hidden shrink-0'
+      }`}
     >
       {/* ── Header ── */}
       <div className="p-6 border-b border-slate-700/30">
