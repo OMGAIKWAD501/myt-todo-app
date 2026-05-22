@@ -1,5 +1,4 @@
-import React, { createContext, useState, useCallback, useEffect, useRef } from 'react';
-import { dummyTasks } from '../data/dummyData';
+import React, { createContext, useState, useCallback, useEffect } from 'react';
 import { formatDate } from '../utils/dateUtils';
 
 export const TaskContext = createContext();
@@ -40,7 +39,6 @@ export const TaskProvider = ({ children }) => {
     return saved !== 'false';
   });
   const [isLoaded, setIsLoaded] = useState(false);
-  const seededRef = useRef(false);
 
   useEffect(() => {
     const savedTasks = localStorage.getItem(STORAGE_KEY);
@@ -62,16 +60,6 @@ export const TaskProvider = ({ children }) => {
       }
     }
 
-    if (!seededRef.current) {
-      seededRef.current = true;
-      setTasks(
-        dummyTasks.map((task) => ({
-          ...task,
-          completedDates: task.completed ? [task.startDate] : [],
-          createdAt: new Date().toISOString(),
-        }))
-      );
-    }
     setIsLoaded(true);
   }, []);
 

@@ -5,7 +5,7 @@ import { formatDate, isToday } from '../utils/dateUtils';
 import TaskCard from './TaskCard';
 
 const DayView = ({ selectedDate, onDateSelect }) => {
-  const { getTasksForDate, deleteTask } = useTaskContext();
+  const { getTasksForDate, deleteTask, toggleTaskCompletion } = useTaskContext();
   const dateString = formatDate(selectedDate);
   const tasks = useMemo(
     () => getTasksForDate(dateString),
@@ -43,7 +43,9 @@ const DayView = ({ selectedDate, onDateSelect }) => {
               key={task.id}
               task={task}
               onDelete={deleteTask}
+              onToggle={toggleTaskCompletion}
               index={idx}
+              dateString={dateString}
             />
           ))
         )}

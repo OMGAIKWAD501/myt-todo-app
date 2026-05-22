@@ -114,8 +114,6 @@ src/
 │   └── useTaskContext.js     # Custom hook for context
 ├── utils/
 │   └── dateUtils.js          # Date formatting utilities
-├── data/
-│   └── dummyData.js          # Sample tasks for demo
 ├── App.jsx                   # Main app component
 ├── index.css                 # Tailwind & global styles
 └── main.jsx                  # React entry point

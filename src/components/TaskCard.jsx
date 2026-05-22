@@ -1,11 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Trash2, CheckCircle2, Circle } from 'lucide-react';
-import { useTaskContext } from '../hooks/useTaskContext';
 
-const TaskCard = ({ task, onDelete, index, dateString }) => {
-  const { toggleTaskCompletion } = useTaskContext();
-  const isChecked = dateString ? task.isCompletedForDate : task.completed;
+const TaskCard = ({ task, onDelete, index, dateString, onToggle }) => {
+  const isChecked = task.isCompletedForDate !== undefined ? task.isCompletedForDate : task.completed;
 
   const categoryColors = {
     personal: 'from-yellow-500 to-orange-500',
@@ -41,7 +39,7 @@ const TaskCard = ({ task, onDelete, index, dateString }) => {
         <motion.button
           whileHover={{ scale: 1.2 }}
           whileTap={{ scale: 0.9 }}
-          onClick={() => toggleTaskCompletion(task.id, dateString)}
+          onClick={() => (onToggle ? onToggle(task.id, dateString) : null)}
           className="mt-1 flex-shrink-0 text-slate-400 hover:text-purple-400 transition-all"
         >
           {isChecked ? (
@@ -91,7 +89,7 @@ const TaskCard = ({ task, onDelete, index, dateString }) => {
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => onDelete(task.id)}
+          onClick={() => onDelete(task.id, dateString)}
           className="flex-shrink-0 p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
         >
           <Trash2 className="w-4 h-4" />

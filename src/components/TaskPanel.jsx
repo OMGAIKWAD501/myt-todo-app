@@ -169,6 +169,7 @@ const TaskPanel = ({ selectedDate, onAddTask, showAllTasks = false }) => {
                     onDelete={deleteTask}
                     onToggle={toggleTaskCompletion}
                     onEdit={setEditingTask}
+                    dateString={filterMode === 'date' ? dateString : null}
                   />
                 ))}
               </div>
@@ -191,6 +192,7 @@ const TaskPanel = ({ selectedDate, onAddTask, showAllTasks = false }) => {
                     onDelete={deleteTask}
                     onToggle={toggleTaskCompletion}
                     onEdit={setEditingTask}
+                    dateString={filterMode === 'date' ? dateString : null}
                   />
                 ))}
               </div>
@@ -256,8 +258,13 @@ const TaskPanel = ({ selectedDate, onAddTask, showAllTasks = false }) => {
 };
 
 // ── Task Card ─────────────────────────────────────────────────────
-const TaskCard = ({ task, index, onDelete, onToggle, onEdit }) => {
+const TaskCard = ({ task, index, onDelete, onToggle, onEdit, dateString }) => {
   const [hovered, setHovered] = useState(false);
+
+  // When viewing a specific date, show per-date completion; otherwise use overall flag
+  const isCompletedForView = dateString
+    ? Array.isArray(task.completedDates) && task.completedDates.includes(dateString)
+    : task.completed;
 
   return (
     <motion.div
@@ -269,21 +276,21 @@ const TaskCard = ({ task, index, onDelete, onToggle, onEdit }) => {
       onHoverStart={() => setHovered(true)}
       onHoverEnd={() => setHovered(false)}
       onDoubleClick={() => onEdit(task)}
-      draggable={!task.completed}
+      draggable={!isCompletedForView}
       onDragStart={(e) => {
         e.dataTransfer.setData('taskId', task.id);
         e.dataTransfer.setData('sourceDateStr', task.startDate);
         e.dataTransfer.effectAllowed = 'move';
       }}
       className={`p-3 rounded-2xl border transition-all relative ${
-        task.completed
+        isCompletedForView
           ? 'bg-slate-800/20 border-slate-700/20 opacity-60'
           : 'bg-slate-800/50 border-slate-700/30 hover:border-purple-500/40'
-      } ${!task.completed ? 'cursor-grab active:cursor-grabbing' : ''}`}
+      } ${!isCompletedForView ? 'cursor-grab active:cursor-grabbing' : ''}`}
     >
       {/* Double-click hint */}
       <AnimatePresence>
-        {hovered && !task.completed && (
+        {hovered && !isCompletedForView && (
           <motion.div
             initial={{ opacity: 0, y: 2 }}
             animate={{ opacity: 1, y: 0 }}
@@ -297,7 +304,7 @@ const TaskCard = ({ task, index, onDelete, onToggle, onEdit }) => {
 
       <div className="flex items-start gap-3">
         {/* Drag handle */}
-        {!task.completed && (
+        {!isCompletedForView && (
           <GripVertical className="w-3.5 h-3.5 text-slate-600 flex-shrink-0 mt-0.5" />
         )}
 
@@ -306,10 +313,10 @@ const TaskCard = ({ task, index, onDelete, onToggle, onEdit }) => {
           whileHover={{ scale: 1.2 }}
           whileTap={{ scale: 0.9 }}
           type="button"
-          onClick={() => onToggle(task.id)}
+          onClick={() => onToggle(task.id, dateString)}
           className="mt-0.5 flex-shrink-0 text-slate-400 hover:text-purple-400 transition-colors"
         >
-          {task.completed ? (
+          {isCompletedForView ? (
             <CheckCircle2 className="w-5 h-5 text-green-500" />
           ) : (
             <Circle className="w-5 h-5" />
@@ -320,7 +327,7 @@ const TaskCard = ({ task, index, onDelete, onToggle, onEdit }) => {
         <div className="flex-1 min-w-0">
           <h3
             className={`font-semibold text-sm truncate ${
-              task.completed ? 'text-slate-500 line-through' : 'text-white'
+              isCompletedForView ? 'text-slate-500 line-through' : 'text-white'
             }`}
           >
             {task.title}
