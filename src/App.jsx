@@ -4,35 +4,97 @@ import Sidebar from './components/Sidebar';
 import CenterSection from './components/CenterSection';
 import TaskPanel from './components/TaskPanel';
 import AddTaskModal from './components/AddTaskModal';
+import SettingsModal from './components/SettingsModal';
+import AllTasksView from './components/AllTasksView';
+import StatsView from './components/StatsView';
+import SimpleListView from './components/SimpleListView';
 import { useTaskContext } from './hooks/useTaskContext';
-import { dummyTasks } from './data/dummyData';
+import { isSameMonth } from './utils/dateUtils';
 
 function App() {
-  const { tasks, addTask } = useTaskContext();
+  const { selectedDate, setSelectedDate, isLoaded } = useTaskContext();
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(new Date());
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-
-  // Initialize with dummy data if no tasks exist
-  React.useEffect(() => {
-    if (tasks.length === 0) {
-      dummyTasks.forEach((task) => {
-        addTask(task);
-      });
-    }
-  }, []);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [activeView, setActiveView] = useState('calendar');
+  const [viewMode, setViewMode] = useState('Month');
 
   const handleDateChange = (newDate) => {
     setCurrentDate(newDate);
   };
 
   const handleDateSelect = (date) => {
-    setSelectedDate(date);
+    const next = new Date(date);
+    setSelectedDate(next);
+    if (!isSameMonth(next, currentDate)) {
+      setCurrentDate(new Date(next.getFullYear(), next.getMonth(), 1));
+    }
+  };
+
+  const handleToday = () => {
+    const today = new Date();
+    setCurrentDate(today);
+    setSelectedDate(today);
   };
 
   const handleAddTask = () => {
     setIsAddModalOpen(true);
   };
+
+  const renderMainContent = () => {
+    switch (activeView) {
+      case 'tasks':
+        return <AllTasksView />;
+      case 'stats':
+        return <StatsView />;
+      case 'habits':
+        return (
+          <SimpleListView
+            title="Habits"
+            storageKey="myTrackerHabits"
+            placeholder="Add a habit..."
+          />
+        );
+      case 'notes':
+        return (
+          <SimpleListView
+            title="Notes"
+            storageKey="myTrackerNotes"
+            placeholder="Add a note..."
+          />
+        );
+      case 'goals':
+        return (
+          <SimpleListView
+            title="Goals"
+            storageKey="myTrackerGoals"
+            placeholder="Add a goal..."
+          />
+        );
+      case 'calendar':
+      default:
+        return (
+          <CenterSection
+            currentDate={currentDate}
+            selectedDate={selectedDate}
+            viewMode={viewMode}
+            onDateChange={handleDateChange}
+            onDateSelect={handleDateSelect}
+            onViewModeChange={setViewMode}
+            onAddTask={handleAddTask}
+            onToday={handleToday}
+          />
+        );
+    }
+  };
+
+  if (!isLoaded) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-slate-900 text-slate-400">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -41,7 +103,6 @@ function App() {
       transition={{ duration: 0.5 }}
       className="flex h-screen overflow-hidden bg-gradient-to-br from-navy via-slate-900 to-slate-900 relative"
     >
-      {/* Background gradient animation */}
       <motion.div
         animate={{
           background: [
@@ -51,28 +112,36 @@ function App() {
           ],
         }}
         transition={{ duration: 10, repeat: Infinity }}
-        className="fixed inset-0 pointer-events-none"
+        className="fixed inset-0 pointer-events-none z-0"
       />
 
-      {/* Left Sidebar */}
-      <Sidebar />
-
-      {/* Center Calendar Section */}
-      <CenterSection
-        currentDate={currentDate}
-        onDateChange={handleDateChange}
-        onDateSelect={handleDateSelect}
-        onAddTask={handleAddTask}
+      <Sidebar
+        activeView={activeView}
+        onViewChange={setActiveView}
+        onOpenSettings={() => setIsSettingsOpen(true)}
       />
 
-      {/* Right Task Panel */}
-      <TaskPanel selectedDate={selectedDate} />
+      <div className="flex flex-1 min-w-0 relative z-10">
+        {renderMainContent()}
 
-      {/* Add Task Modal */}
+        {(activeView === 'calendar' || activeView === 'tasks') && (
+          <TaskPanel
+            selectedDate={selectedDate}
+            onAddTask={handleAddTask}
+            showAllTasks={activeView === 'tasks'}
+          />
+        )}
+      </div>
+
       <AddTaskModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         selectedDate={selectedDate}
+      />
+
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
       />
     </motion.div>
   );

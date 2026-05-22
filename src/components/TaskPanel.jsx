@@ -1,16 +1,23 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDate } from '../utils/dateUtils';
 import { useTaskContext } from '../hooks/useTaskContext';
 import TaskCard from './TaskCard';
-import { CheckCircle2, Clock, AlertCircle } from 'lucide-react';
+import { CheckCircle2, Clock, AlertCircle, Plus, CalendarDays, ListTodo } from 'lucide-react';
 
-const TaskPanel = ({ selectedDate }) => {
+const TaskPanel = ({ selectedDate, onAddTask, showAllTasks = false }) => {
   const { tasks, getTasksForDate, deleteTask, getCompletedCount, getInProgressCount } = useTaskContext();
-  
+  const [filterMode, setFilterMode] = useState('all'); // 'all' | 'date'
+
   const dateString = formatDate(selectedDate);
-  const tasksForDate = useMemo(() => getTasksForDate(dateString), [dateString, tasks]);
-  
+
+  const tasksForDate = useMemo(() => {
+    if (showAllTasks) return [...tasks].sort((a, b) => (a.startDate < b.startDate ? 1 : -1));
+    if (filterMode === 'date') return getTasksForDate(dateString);
+    // 'all' mode: show all tasks sorted by date descending
+    return [...tasks].sort((a, b) => (a.startDate < b.startDate ? 1 : -1));
+  }, [dateString, tasks, showAllTasks, filterMode, getTasksForDate]);
+
   const completedTasks = useMemo(
     () => tasksForDate.filter((t) => t.completed),
     [tasksForDate]
@@ -33,20 +40,68 @@ const TaskPanel = ({ selectedDate }) => {
     >
       {/* Header */}
       <div className="p-6 border-b border-slate-700/30 bg-gradient-to-r from-slate-900/50 via-slate-900/30 to-navy/50 backdrop-blur-xl">
-        <motion.h2
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-2xl font-bold text-white mb-2"
-        >
-          My To Do List
-        </motion.h2>
-        <p className="text-sm text-slate-400">
-          {selectedDate.toLocaleDateString('en-US', {
-            weekday: 'long',
-            month: 'long',
-            day: 'numeric',
-          })}
-        </p>
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <motion.h2
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-2xl font-bold text-white mb-2"
+            >
+              {showAllTasks ? 'All Tasks' : 'My To Do List'}
+            </motion.h2>
+            <p className="text-sm text-slate-400">
+              {filterMode === 'date' && !showAllTasks
+                ? selectedDate.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    month: 'long',
+                    day: 'numeric',
+                  })
+                : `${tasks.length} total tasks`}
+            </p>
+          </div>
+          {onAddTask && (
+            <motion.button
+              type="button"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onAddTask}
+              className="p-2 rounded-lg bg-purple-500/20 border border-purple-500/40 text-purple-300 hover:text-white shrink-0"
+              aria-label="Add task"
+            >
+              <Plus className="w-5 h-5" />
+            </motion.button>
+          )}
+        </div>
+
+        {/* Filter Toggle — only in calendar view */}
+        {!showAllTasks && (
+          <div className="flex gap-2 mt-4">
+            <button
+              type="button"
+              onClick={() => setFilterMode('all')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                filterMode === 'all'
+                  ? 'bg-purple-600/40 border border-purple-500/60 text-purple-200'
+                  : 'bg-slate-800/40 border border-slate-700/40 text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <ListTodo className="w-3 h-3" />
+              All Tasks
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterMode('date')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                filterMode === 'date'
+                  ? 'bg-blue-600/40 border border-blue-500/60 text-blue-200'
+                  : 'bg-slate-800/40 border border-slate-700/40 text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <CalendarDays className="w-3 h-3" />
+              This Date
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Tasks List */}
@@ -54,7 +109,7 @@ const TaskPanel = ({ selectedDate }) => {
         <AnimatePresence mode="popLayout">
           {/* Pending Tasks */}
           {pendingTasks.length > 0 && (
-            <motion.div>
+            <motion.div key="pending">
               <h3 className="text-xs uppercase font-bold text-slate-400 mb-3 flex items-center gap-2">
                 <Clock className="w-3 h-3" />
                 In Progress ({pendingTasks.length})
@@ -74,7 +129,7 @@ const TaskPanel = ({ selectedDate }) => {
 
           {/* Completed Tasks */}
           {completedTasks.length > 0 && (
-            <motion.div>
+            <motion.div key="completed">
               <h3 className="text-xs uppercase font-bold text-slate-400 mb-3 flex items-center gap-2">
                 <CheckCircle2 className="w-3 h-3 text-green-500" />
                 Completed ({completedTasks.length})
@@ -95,6 +150,7 @@ const TaskPanel = ({ selectedDate }) => {
           {/* Empty State */}
           {tasksForDate.length === 0 && (
             <motion.div
+              key="empty"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               className="flex flex-col items-center justify-center py-12 text-center"
@@ -106,10 +162,19 @@ const TaskPanel = ({ selectedDate }) => {
               >
                 <AlertCircle className="w-12 h-12 text-slate-600 mx-auto" />
               </motion.div>
-              <p className="text-slate-400">No tasks for this date</p>
-              <p className="text-xs text-slate-500 mt-1">
-                Add a task to get started
+              <p className="text-slate-400">
+                {filterMode === 'date' ? 'No tasks for this date' : 'No tasks yet'}
               </p>
+              {onAddTask && (
+                <motion.button
+                  type="button"
+                  whileHover={{ scale: 1.05 }}
+                  onClick={onAddTask}
+                  className="mt-4 px-4 py-2 text-sm bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 rounded-lg border border-purple-500/30"
+                >
+                  Add Task
+                </motion.button>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

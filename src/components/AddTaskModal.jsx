@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, AlertCircle } from 'lucide-react';
 import { useTaskContext } from '../hooks/useTaskContext';
@@ -15,6 +15,16 @@ const AddTaskModal = ({ isOpen, onClose, selectedDate }) => {
     endDate: formatDate(selectedDate),
   });
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const dateStr = formatDate(selectedDate);
+    setFormData((prev) => ({
+      ...prev,
+      startDate: dateStr,
+      endDate: dateStr,
+    }));
+  }, [selectedDate, isOpen]);
 
   const categories = ['personal', 'work', 'health', 'learning', 'shopping'];
   const priorities = ['low', 'medium', 'high'];

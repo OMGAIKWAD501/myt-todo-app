@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import {
   Calendar,
@@ -13,9 +13,9 @@ import {
 } from 'lucide-react';
 import { useTaskContext } from '../hooks/useTaskContext';
 
-const Sidebar = () => {
-  const { isDarkMode, setIsDarkMode } = useTaskContext();
-  const [activeTab, setActiveTab] = useState('calendar');
+const Sidebar = ({ activeView, onViewChange, onOpenSettings }) => {
+  const { isDarkMode, setIsDarkMode, getTodayProgress } = useTaskContext();
+  const { completed, total, percent } = getTodayProgress();
 
   const navItems = [
     { id: 'calendar', label: 'Calendar', icon: Calendar },
@@ -26,23 +26,15 @@ const Sidebar = () => {
     { id: 'goals', label: 'Goals', icon: Target },
   ];
 
-  const completedCount = 8;
-  const totalCount = 12;
-  const progressPercent = (completedCount / totalCount) * 100;
-
   return (
     <motion.div
       initial={{ x: -100, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="w-64 bg-gradient-to-b from-slate-900 via-slate-900 to-navy border-r border-slate-700/50 flex flex-col h-screen backdrop-blur-xl"
+      className="w-64 bg-gradient-to-b from-slate-900 via-slate-900 to-navy border-r border-slate-700/50 flex flex-col h-screen backdrop-blur-xl relative z-20 shrink-0"
     >
-      {/* Logo */}
       <div className="p-6 border-b border-slate-700/30">
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          className="flex items-center gap-3"
-        >
+        <motion.div whileHover={{ scale: 1.05 }} className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/50">
             <Zap className="w-6 h-6 text-white" />
           </div>
@@ -53,17 +45,17 @@ const Sidebar = () => {
         </motion.div>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 px-4 py-6 space-y-2">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = activeTab === item.id;
+          const isActive = activeView === item.id;
 
           return (
             <motion.button
               key={item.id}
+              type="button"
               whileHover={{ x: 5 }}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => onViewChange(item.id)}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                 isActive
                   ? 'bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/50 text-purple-300 shadow-lg shadow-purple-500/20'
@@ -83,7 +75,6 @@ const Sidebar = () => {
         })}
       </nav>
 
-      {/* Progress Card */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -93,23 +84,25 @@ const Sidebar = () => {
         <h3 className="text-sm font-bold text-white mb-3">Daily Progress</h3>
         <div className="space-y-2">
           <div className="flex justify-between text-xs text-slate-300 mb-1">
-            <span>{completedCount} completed</span>
-            <span className="text-purple-400">{progressPercent.toFixed(0)}%</span>
+            <span>
+              {completed} of {total} completed
+            </span>
+            <span className="text-purple-400">{percent.toFixed(0)}%</span>
           </div>
           <div className="w-full bg-slate-700/30 rounded-full h-2 overflow-hidden border border-slate-600/50">
             <motion.div
               initial={{ width: 0 }}
-              animate={{ width: `${progressPercent}%` }}
-              transition={{ duration: 1, delay: 0.5 }}
+              animate={{ width: `${percent}%` }}
+              transition={{ duration: 0.5 }}
               className="h-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full shadow-lg shadow-purple-500/50"
             />
           </div>
         </div>
       </motion.div>
 
-      {/* Bottom Section */}
       <div className="p-4 border-t border-slate-700/30 space-y-3">
         <motion.button
+          type="button"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsDarkMode(!isDarkMode)}
@@ -129,8 +122,10 @@ const Sidebar = () => {
         </motion.button>
 
         <motion.button
+          type="button"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          onClick={onOpenSettings}
           className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg transition-all text-slate-300 hover:text-white"
         >
           <Settings className="w-4 h-4" />

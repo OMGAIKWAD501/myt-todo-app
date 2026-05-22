@@ -1,47 +1,54 @@
+import { formatDate, addDays } from '../utils/dateUtils';
+
+const today = new Date();
+const todayStr = formatDate(today);
+const twoDaysLater = formatDate(addDays(today, 2));
+const yesterday = formatDate(addDays(today, -1));
+
 export const dummyTasks = [
   {
     id: '1',
     title: 'Design UI mockups',
     description: 'Create wireframes and high-fidelity mockups',
-    startDate: new Date().toISOString().split('T')[0],
-    endDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    category: 'design',
+    startDate: todayStr,
+    endDate: twoDaysLater,
+    category: 'work',
     priority: 'high',
     completed: false,
-    color: 'purple',
+    color: 'work',
   },
   {
     id: '2',
     title: 'Review pull requests',
     description: 'Check and merge pending PRs',
-    startDate: new Date().toISOString().split('T')[0],
-    endDate: new Date().toISOString().split('T')[0],
-    category: 'development',
+    startDate: todayStr,
+    endDate: todayStr,
+    category: 'work',
     priority: 'medium',
     completed: false,
-    color: 'blue',
+    color: 'work',
   },
   {
     id: '3',
     title: 'Team meeting',
     description: 'Weekly standup at 10 AM',
-    startDate: new Date().toISOString().split('T')[0],
-    endDate: new Date().toISOString().split('T')[0],
-    category: 'meeting',
+    startDate: todayStr,
+    endDate: todayStr,
+    category: 'personal',
     priority: 'high',
     completed: false,
-    color: 'pink',
+    color: 'personal',
   },
   {
     id: '4',
     title: 'Update documentation',
     description: 'Update API docs and README',
-    startDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    endDate: new Date().toISOString().split('T')[0],
-    category: 'documentation',
+    startDate: yesterday,
+    endDate: todayStr,
+    category: 'learning',
     priority: 'low',
     completed: true,
-    color: 'green',
+    color: 'learning',
   },
 ];
 
@@ -52,13 +59,4 @@ export const categoryColors = {
   documentation: '#10b981',
   personal: '#f59e0b',
   health: '#ef4444',
-};
-
-export const categoryIcons = {
-  design: 'Palette',
-  development: 'Code',
-  meeting: 'Users',
-  documentation: 'FileText',
-  personal: 'Heart',
-  health: 'Activity',
 };

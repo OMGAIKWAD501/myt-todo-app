@@ -6,20 +6,27 @@ export const getFirstDayOfMonth = (date) => {
   return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
 };
 
+/** Local calendar date as YYYY-MM-DD (avoids UTC shift from toISOString). */
 export const formatDate = (date) => {
-  return date.toISOString().split('T')[0];
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 };
 
 export const getDateFromString = (dateString) => {
-  return new Date(dateString + 'T00:00:00');
+  const [y, m, d] = dateString.split('-').map(Number);
+  return new Date(y, m - 1, d);
 };
 
-export const isToday = (date) => {
-  const today = new Date();
+export const isToday = (date) => isSameDay(date, new Date());
+
+export const isSameDay = (date1, date2) => {
+  if (!date1 || !date2) return false;
   return (
-    date.getDate() === today.getDate() &&
-    date.getMonth() === today.getMonth() &&
-    date.getFullYear() === today.getFullYear()
+    date1.getDate() === date2.getDate() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getFullYear() === date2.getFullYear()
   );
 };
 
@@ -55,6 +62,16 @@ export const addDays = (date, days) => {
 export const getWeekStart = (date) => {
   const d = new Date(date);
   const day = d.getDay();
-  const diff = d.getDate() - day;
-  return new Date(d.setDate(diff));
+  d.setDate(d.getDate() - day);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
+export const getWeekDays = (date) => {
+  const start = getWeekStart(date);
+  return Array.from({ length: 7 }, (_, i) => addDays(start, i));
+};
+
+export const getMonthsInYear = (year) => {
+  return Array.from({ length: 12 }, (_, i) => new Date(year, i, 1));
 };
